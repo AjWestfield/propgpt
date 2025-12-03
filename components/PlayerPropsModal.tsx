@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import { PlayerProp } from '../data/mockProps';
+import { PlayerProp } from '../services/playerPropsService';
 import { EnhancedBarChart } from './EnhancedBarChart';
 import { usePlayerChartData } from '../hooks/usePlayerChartData';
 import { PlayerAvatar } from './PlayerAvatar';
@@ -38,18 +38,18 @@ function PropMiniChart({ prop }: { prop: PlayerProp }) {
     return (
       <View style={styles.recentGamesRow}>
         <Text style={styles.recentLabel}>Last 5: </Text>
-        {prop.recentGames.slice(0, 5).map((value, idx) => (
+        {prop.recentGames.slice(0, 5).map((game, idx) => (
           <View
             key={idx}
             style={[
               styles.gameValue,
-              value > prop.line ? styles.gameValueOver : styles.gameValueUnder
+              game.value > prop.line ? styles.gameValueOver : styles.gameValueUnder
             ]}
           >
-            <Text style={styles.gameValueText}>{value}</Text>
+            <Text style={styles.gameValueText}>{game.value}</Text>
           </View>
         ))}
-        <Text style={styles.hitRateText}>Hit: {prop.hitRate}%</Text>
+        <Text style={styles.hitRateText}>Conf: {prop.confidence}%</Text>
       </View>
     );
   }
@@ -103,8 +103,8 @@ export function PlayerPropsModal({ visible, onClose, playerProps, playerName, on
               {/* Player Avatar - Centered */}
               <View style={styles.avatarContainer}>
                 <PlayerAvatar
-                  imageUrl={firstProp.playerImage}
-                  teamLogo={firstProp.teamLogo}
+                  imageUrl={firstProp.headshot}
+                  teamLogo={firstProp.team.logo}
                   size={110}
                   showTeamBadge={true}
                 />
@@ -127,20 +127,20 @@ export function PlayerPropsModal({ visible, onClose, playerProps, playerName, on
               <View style={styles.matchupContainer}>
                 <View style={styles.teamContainer}>
                   <Image
-                    source={{ uri: firstProp.teamLogo }}
+                    source={{ uri: firstProp.team.logo }}
                     style={styles.teamLogoLarge}
                     resizeMode="contain"
                   />
-                  <Text style={styles.teamName}>{firstProp.team}</Text>
+                  <Text style={styles.teamName}>{firstProp.team.abbreviation}</Text>
                 </View>
                 <Text style={styles.vsText}>VS</Text>
                 <View style={styles.teamContainer}>
                   <Image
-                    source={{ uri: firstProp.opponentLogo }}
+                    source={{ uri: firstProp.opponent.logo }}
                     style={styles.teamLogoLarge}
                     resizeMode="contain"
                   />
-                  <Text style={styles.teamName}>{firstProp.opponent}</Text>
+                  <Text style={styles.teamName}>{firstProp.opponent.abbreviation}</Text>
                 </View>
               </View>
             </View>
@@ -162,11 +162,11 @@ export function PlayerPropsModal({ visible, onClose, playerProps, playerName, on
                     disabled={!onPropPress}
                   >
                     <View style={styles.propHeader}>
-                      <Text style={styles.propType}>{prop.propType}</Text>
+                      <Text style={styles.propType}>{prop.statType}</Text>
                       <View style={styles.propHeaderRight}>
                         <View style={styles.pickBadge}>
-                          <Text style={[styles.pickText, prop.over ? styles.pickOver : styles.pickUnder]}>
-                            {prop.over ? 'OVER' : 'UNDER'}
+                          <Text style={[styles.pickText, prop.recommendation === 'OVER' ? styles.pickOver : styles.pickUnder]}>
+                            {prop.recommendation}
                           </Text>
                         </View>
                         <TouchableOpacity
@@ -192,8 +192,8 @@ export function PlayerPropsModal({ visible, onClose, playerProps, playerName, on
                       <Text style={styles.statValue}>{prop.line}</Text>
                     </View>
                     <View style={styles.statItem}>
-                      <Text style={styles.statLabel}>Projection</Text>
-                      <Text style={styles.statValueHighlight}>{prop.projection}</Text>
+                      <Text style={styles.statLabel}>Season Avg</Text>
+                      <Text style={styles.statValueHighlight}>{prop.seasonAverage.toFixed(1)}</Text>
                     </View>
                     <View style={styles.statItem}>
                       <Text style={styles.statLabel}>Confidence</Text>
@@ -216,7 +216,7 @@ export function PlayerPropsModal({ visible, onClose, playerProps, playerName, on
                   {/* Mini Bar Chart */}
                   <PropMiniChart prop={prop} />
 
-                  <Text style={styles.reasoning}>{prop.reasoning}</Text>
+                  <Text style={styles.reasoning}>{prop.position || prop.sport}</Text>
 
                   {onPropPress && (
                     <TouchableOpacity

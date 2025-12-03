@@ -1,16 +1,29 @@
 # 🎯 PropGPT - AI-Powered Player Props Analytics
 
-PropGPT is a modern React Native Expo application that provides AI-powered analytics and predictions for sports player props across NBA, NFL, MLB, and NHL.
+PropGPT is a modern React Native Expo application that provides AI-powered analytics and predictions for sports player props across NBA, NFL, MLB, NHL, NCAAF, and NCAAB.
 
 ![PropGPT](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![React Native](https://img.shields.io/badge/React%20Native-0.76.5-61DAFB.svg)
 ![Expo](https://img.shields.io/badge/Expo-52.0.31-000020.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-3178C6.svg)
 
+## 🔴 Live Data Sources
+
+PropGPT uses **real-time data** from multiple APIs:
+
+| Feature | API Source |
+|---------|------------|
+| Live Scores & Schedules | ESPN API |
+| Box Scores & Game Stats | ESPN Box Score API |
+| Betting Odds & Lines | The Odds API (odds-api.io) |
+| NHL Player Stats | NHL Stats API |
+| MLB Player Stats | MLB Stats API |
+| Predictions & Confidence | Calculated via `predictionService.ts` |
+
 ## ✨ Features
 
 ### 🏠 Home Screen
-- **Sports Selector**: Filter props by NBA, NFL, MLB, NHL, or view all
+- **Sports Selector**: Filter props by NBA, NFL, MLB, NHL, NCAAF, NCAAB, or view all
 - **Featured Props**: High-confidence picks (85%+)
 - **Trending Section**: Players on hot streaks with upward momentum
 - **Comprehensive Props List**: All available player props with detailed stats
@@ -20,7 +33,7 @@ PropGPT is a modern React Native Expo application that provides AI-powered analy
 - Smart responses with prop recommendations
 - Interactive suggestions for quick navigation
 - Player-specific analysis with reasoning
-- Mock AI implementation (ready for real AI integration)
+- Real-time prop data integration
 
 ### 📊 Analytics Dashboard
 - **Overview Stats**: Total props, high confidence count, average confidence, trending count
@@ -68,15 +81,33 @@ propgpt/
 │   ├── HomeScreen.tsx          # Main props discovery screen
 │   ├── ChatScreen.tsx          # AI conversational interface
 │   ├── AnalyticsScreen.tsx     # Stats and data visualizations
-│   └── ProfileScreen.tsx       # User profile and settings
+│   ├── ProfileScreen.tsx       # User profile and settings
+│   ├── GameDetailScreen.tsx    # Live game details with box scores
+│   └── PlayerDetailScreen.tsx  # Player stats and prop history
 ├── components/
 │   ├── PropCard.tsx            # Reusable prop display card
-│   └── ConfidenceIndicator.tsx # Confidence visualization
+│   ├── PlayerCard.tsx          # Player-centric prop card
+│   ├── EnhancedBarChart.tsx    # Performance trend charts
+│   ├── PlayerAvatar.tsx        # Player headshot with team badge
+│   └── LiveBadge.tsx           # Live game indicator
+├── services/
+│   ├── sportsApi.ts            # ESPN API integration
+│   ├── boxScoreApi.ts          # ESPN box score data
+│   ├── oddsApiIO.ts            # The Odds API integration
+│   ├── playerPropsService.ts   # Player props generation
+│   ├── predictionService.ts    # Confidence calculations
+│   ├── nhlStatsApi.ts          # NHL Stats API
+│   └── mlbStatsApi.ts          # MLB Stats API
+├── hooks/
+│   ├── usePlayerChartData.ts   # Chart data fetching
+│   ├── useLiveScores.ts        # Real-time score updates
+│   └── useGameDetail.ts        # Game detail data
+├── contexts/
+│   └── MyPicksContext.tsx      # Saved picks state management
 ├── navigation/
 │   └── MainNavigator.tsx       # Bottom tab navigation
-├── data/
-│   └── mockProps.ts            # Mock player props data
-└── utils/                      # Utility functions (future)
+└── types/
+    └── playerProp.ts           # TypeScript interfaces
 ```
 
 ## 🚀 Getting Started
@@ -139,23 +170,23 @@ User management and settings:
 - Account management
 - Support and help center
 
-## 🎯 Mock Data
+## 🎯 Real-Time Data
 
-The app includes comprehensive mock data for all sports:
+The app fetches live data from multiple sources:
 
-- **12 player props** across NBA, NFL, MLB, NHL
-- **Realistic projections** with confidence scores
-- **Recent game history** (last 5 games)
-- **Matchup analysis** with opponent stats
-- **Reasoning** for each prediction
+- **Live player props** across NBA, NFL, MLB, NHL, NCAAF, NCAAB
+- **Real betting lines** from major sportsbooks via The Odds API
+- **Live game scores** and schedules from ESPN
+- **Player statistics** from official league APIs (NBA, NHL, MLB)
+- **Calculated confidence scores** based on historical performance
 
 ## 🔮 Future Enhancements
 
 ### Near-Term (MVP+)
-- [ ] Real API integration for live props
-- [ ] Actual AI/GPT integration for chat
+- [x] Real API integration for live props (ESPN, Odds API, NHL/MLB Stats)
+- [ ] AI/GPT integration for chat analysis
 - [ ] User authentication and profiles
-- [ ] Saved props and favorites
+- [x] Saved props and favorites (My Picks)
 - [ ] Push notifications for game times
 
 ### Mid-Term
@@ -203,6 +234,8 @@ Trend Up: '#10B981'     // Green for upward trends
 - **NFL**: Football player props (passing yards, TDs, receptions)
 - **MLB**: Baseball player props (hits, total bases, strikeouts)
 - **NHL**: Hockey player props (points, shots on goal)
+- **NCAAF**: College football player props
+- **NCAAB**: College basketball player props
 
 ## 📊 Confidence System
 
@@ -224,7 +257,7 @@ This is a personal project, but suggestions and feedback are welcome!
 
 - Built with React Native and Expo
 - Design inspired by Apple's iOS Human Interface Guidelines
-- Mock data created for demonstration purposes
+- Live data powered by ESPN, The Odds API, NHL Stats API, and MLB Stats API
 
 ---
 

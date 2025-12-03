@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { PlayerProp } from '../data/mockProps';
+import { PlayerProp } from '../services/playerPropsService';
 import { EnhancedBarChart } from './EnhancedBarChart';
 import { usePlayerChartData } from '../hooks/usePlayerChartData';
 import { formatStatValue } from '../utils/chartDataFormatter';
@@ -61,18 +61,18 @@ export function ChartModal({ visible, prop, onClose, onViewFullDetails }: ChartM
           {/* Player Info */}
           <View style={styles.playerSection}>
             <Image
-              source={{ uri: prop.playerImage }}
+              source={{ uri: prop.headshot }}
               style={styles.playerImage}
               resizeMode="contain"
             />
             <View style={styles.playerInfo}>
               <Text style={styles.playerName}>{prop.playerName}</Text>
               <View style={styles.matchupRow}>
-                <Text style={styles.teamName}>{prop.team}</Text>
+                <Text style={styles.teamName}>{prop.team.abbreviation}</Text>
                 <Text style={styles.vsText}>vs</Text>
-                <Text style={styles.teamName}>{prop.opponent}</Text>
+                <Text style={styles.teamName}>{prop.opponent.abbreviation}</Text>
               </View>
-              <Text style={styles.propType}>{prop.propType}</Text>
+              <Text style={styles.propType}>{prop.statType}</Text>
             </View>
             <View style={styles.confidenceContainer}>
               <Text style={[styles.confidenceValue, { color: confidenceColor }]}>
@@ -90,14 +90,14 @@ export function ChartModal({ visible, prop, onClose, onViewFullDetails }: ChartM
             </View>
             <View style={styles.propSummaryDivider} />
             <View style={styles.propSummaryItem}>
-              <Text style={styles.propSummaryLabel}>Projection</Text>
-              <Text style={styles.propSummaryValue}>{prop.projection}</Text>
+              <Text style={styles.propSummaryLabel}>Season Avg</Text>
+              <Text style={styles.propSummaryValue}>{prop.seasonAverage.toFixed(1)}</Text>
             </View>
             <View style={styles.propSummaryDivider} />
             <View style={styles.propSummaryItem}>
               <Text style={styles.propSummaryLabel}>Pick</Text>
-              <Text style={[styles.propSummaryPick, prop.over ? styles.pickOver : styles.pickUnder]}>
-                {prop.over ? 'OVER' : 'UNDER'}
+              <Text style={[styles.propSummaryPick, prop.recommendation === 'OVER' ? styles.pickOver : styles.pickUnder]}>
+                {prop.recommendation}
               </Text>
             </View>
           </View>
@@ -134,12 +134,12 @@ export function ChartModal({ visible, prop, onClose, onViewFullDetails }: ChartM
             />
             <QuickStatCard
               label="L5 Avg"
-              value={formatStatValue(last5Average, prop.propType)}
+              value={formatStatValue(last5Average, prop.statType)}
               color="#F59E0B"
             />
             <QuickStatCard
               label="Season Avg"
-              value={formatStatValue(seasonAverage, prop.propType)}
+              value={formatStatValue(seasonAverage, prop.statType)}
               color="#007AFF"
             />
           </View>

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import { PlayerProp } from '../data/mockProps';
+import { PlayerProp } from '../services/playerPropsService';
 import { EnhancedBarChart } from '../components/EnhancedBarChart';
 import { usePlayerChartData } from '../hooks/usePlayerChartData';
 import { formatStatValue, getTrendEmoji } from '../utils/chartDataFormatter';
@@ -65,8 +65,8 @@ export function PlayerDetailScreen({ route }: PlayerDetailScreenProps) {
           {/* Player Avatar - Centered */}
           <View style={styles.avatarContainer}>
             <PlayerAvatar
-              imageUrl={prop.playerImage}
-              teamLogo={prop.teamLogo}
+              imageUrl={prop.headshot}
+              teamLogo={prop.team.logo}
               size={110}
               showTeamBadge={true}
             />
@@ -89,20 +89,20 @@ export function PlayerDetailScreen({ route }: PlayerDetailScreenProps) {
           <View style={styles.matchupContainer}>
             <View style={styles.teamContainer}>
               <Image
-                source={{ uri: prop.teamLogo }}
+                source={{ uri: prop.team.logo }}
                 style={styles.teamLogoLarge}
                 resizeMode="contain"
               />
-              <Text style={styles.teamName}>{prop.team}</Text>
+              <Text style={styles.teamName}>{prop.team.abbreviation}</Text>
             </View>
             <Text style={styles.vsText}>VS</Text>
             <View style={styles.teamContainer}>
               <Image
-                source={{ uri: prop.opponentLogo }}
+                source={{ uri: prop.opponent.logo }}
                 style={styles.teamLogoLarge}
                 resizeMode="contain"
               />
-              <Text style={styles.teamName}>{prop.opponent}</Text>
+              <Text style={styles.teamName}>{prop.opponent.abbreviation}</Text>
             </View>
           </View>
         </View>
@@ -113,7 +113,7 @@ export function PlayerDetailScreen({ route }: PlayerDetailScreenProps) {
           <BlurView intensity={60} tint="dark" style={styles.propCard}>
             <View style={styles.propCardContent}>
               <View style={styles.propRow}>
-                <Text style={styles.propType}>{prop.propType}</Text>
+                <Text style={styles.propType}>{prop.statType}</Text>
                 <View style={styles.lineContainer}>
                   <Text style={styles.lineLabel}>Line:</Text>
                   <Text style={styles.lineValue}>{prop.line}</Text>
@@ -122,11 +122,11 @@ export function PlayerDetailScreen({ route }: PlayerDetailScreenProps) {
 
               <View style={styles.statsRow}>
                 <View style={styles.statBox}>
-                  <Text style={styles.statLabel}>Projection</Text>
+                  <Text style={styles.statLabel}>Season Avg</Text>
                   <View style={styles.projectionRow}>
-                    <Text style={styles.projectionValue}>{prop.projection}</Text>
-                    <Text style={[styles.pick, prop.over ? styles.pickOver : styles.pickUnder]}>
-                      {prop.over ? 'OVER' : 'UNDER'}
+                    <Text style={styles.projectionValue}>{prop.seasonAverage.toFixed(1)}</Text>
+                    <Text style={[styles.pick, prop.recommendation === 'OVER' ? styles.pickOver : styles.pickUnder]}>
+                      {prop.recommendation}
                     </Text>
                   </View>
                 </View>
@@ -143,8 +143,8 @@ export function PlayerDetailScreen({ route }: PlayerDetailScreenProps) {
               </View>
 
               <View style={styles.reasoningContainer}>
-                <Text style={styles.reasoningLabel}>Analysis:</Text>
-                <Text style={styles.reasoningText}>{prop.reasoning}</Text>
+                <Text style={styles.reasoningLabel}>Position:</Text>
+                <Text style={styles.reasoningText}>{prop.position || 'N/A'}</Text>
               </View>
             </View>
           </BlurView>
@@ -169,7 +169,7 @@ export function PlayerDetailScreen({ route }: PlayerDetailScreenProps) {
           ) : (
             <EnhancedBarChart
               data={chartData}
-              title={`${prop.propType} Performance`}
+              title={`${prop.statType} Performance`}
               subtitle="Last 10 games vs betting line"
               height={300}
               thresholdValue={prop.line}
@@ -189,25 +189,25 @@ export function PlayerDetailScreen({ route }: PlayerDetailScreenProps) {
           <View style={styles.statsGrid}>
             <StatCard
               label="Season Avg"
-              value={formatStatValue(seasonAverage, prop.propType)}
+              value={formatStatValue(seasonAverage, prop.statType)}
               iconName="calendar"
               color="#007AFF"
             />
             <StatCard
               label="L5 Avg"
-              value={formatStatValue(last5Average, prop.propType)}
+              value={formatStatValue(last5Average, prop.statType)}
               iconName="flame"
               color="#F59E0B"
             />
             <StatCard
               label="L10 Avg"
-              value={formatStatValue(last10Average, prop.propType)}
+              value={formatStatValue(last10Average, prop.statType)}
               iconName="bar-chart"
               color="#8B5CF6"
             />
             <StatCard
-              label="vs Opponent"
-              value={formatStatValue(prop.vsOpponentAverage, prop.propType)}
+              label="Line"
+              value={formatStatValue(prop.line, prop.statType)}
               iconName="shield"
               color="#EF4444"
             />
@@ -662,11 +662,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginBottom: 16,
-  },
-  gameTimeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
   },
 });

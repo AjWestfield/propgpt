@@ -180,15 +180,20 @@ export function ProfileScreen() {
 }
 
 function MyPickCard({ pick, onRemove }: { pick: PlayerProp; onRemove: (id: string) => void }) {
+  // Calculate hit rate from recent games
+  const hitRate = pick.recentGames.length > 0
+    ? Math.round((pick.recentGames.filter(g => g.value > pick.line).length / pick.recentGames.length) * 100)
+    : 0;
+
   return (
     <BlurView intensity={60} tint="dark" style={styles.pickCard}>
       <View style={styles.pickHeader}>
         <View style={styles.pickPlayerInfo}>
-          <Image source={{ uri: pick.playerImage }} style={styles.pickAvatar} />
+          <Image source={{ uri: pick.headshot }} style={styles.pickAvatar} />
           <View style={{ flex: 1 }}>
             <Text style={styles.pickPlayerName}>{pick.playerName}</Text>
             <Text style={styles.pickSubtext}>
-              {pick.team} vs {pick.opponent} • {pick.sport}
+              {pick.team.abbreviation} vs {pick.opponent.abbreviation} • {pick.sport}
             </Text>
           </View>
         </View>
@@ -203,20 +208,20 @@ function MyPickCard({ pick, onRemove }: { pick: PlayerProp; onRemove: (id: strin
 
       <View style={styles.pickDetailsRow}>
         <View>
-          <Text style={styles.pickPropType}>{pick.propType}</Text>
+          <Text style={styles.pickPropType}>{pick.statType}</Text>
           <Text style={styles.pickLine}>
             Line: <Text style={styles.pickLineValue}>{pick.line}</Text>
           </Text>
         </View>
         <View style={styles.pickBadgeRow}>
-          <View style={[styles.pickBadge, pick.over ? styles.pickBadgeOver : styles.pickBadgeUnder]}>
+          <View style={[styles.pickBadge, pick.recommendation === 'OVER' ? styles.pickBadgeOver : styles.pickBadgeUnder]}>
             <Text
               style={[
                 styles.pickBadgeText,
-                pick.over ? styles.pickBadgeTextOver : styles.pickBadgeTextUnder,
+                pick.recommendation === 'OVER' ? styles.pickBadgeTextOver : styles.pickBadgeTextUnder,
               ]}
             >
-              {pick.over ? 'OVER' : 'UNDER'}
+              {pick.recommendation}
             </Text>
           </View>
           <View style={styles.confidencePill}>
@@ -233,7 +238,7 @@ function MyPickCard({ pick, onRemove }: { pick: PlayerProp; onRemove: (id: strin
         </View>
         <View style={styles.pickMeta}>
           <Ionicons name="stats-chart-outline" size={14} color="#9CA3AF" />
-          <Text style={styles.pickMetaText}>Hit Rate {Math.round(pick.hitRate)}%</Text>
+          <Text style={styles.pickMetaText}>Hit Rate {hitRate}%</Text>
         </View>
       </View>
     </BlurView>

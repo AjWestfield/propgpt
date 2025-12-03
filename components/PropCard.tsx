@@ -32,17 +32,34 @@ export function PropCard({ prop, onPress }: PropCardProps) {
     prop.confidence >= 70 ? '#F59E0B' :
     '#EF4444';
 
+  // Calculate trend from recent games
+  const calculateTrend = () => {
+    if (prop.recentGames.length < 2) return 'stable';
+    const recent = prop.recentGames.slice(0, 3).reduce((sum, g) => sum + g.value, 0) / 3;
+    const older = prop.recentGames.slice(3, 6).reduce((sum, g) => sum + g.value, 0) / Math.min(3, prop.recentGames.slice(3, 6).length || 1);
+    if (recent > older * 1.1) return 'up';
+    if (recent < older * 0.9) return 'down';
+    return 'stable';
+  };
+
+  const trend = calculateTrend();
+
   const getTrendIcon = () => {
-    if (prop.trend === 'up') return 'trending-up';
-    if (prop.trend === 'down') return 'trending-down';
+    if (trend === 'up') return 'trending-up';
+    if (trend === 'down') return 'trending-down';
     return 'remove';
   };
 
   const getTrendColor = () => {
-    if (prop.trend === 'up') return '#10B981';
-    if (prop.trend === 'down') return '#EF4444';
+    if (trend === 'up') return '#10B981';
+    if (trend === 'down') return '#EF4444';
     return '#9CA3AF';
   };
+
+  // Calculate hit rate from recent games
+  const hitRate = prop.recentGames.length > 0
+    ? Math.round((prop.recentGames.filter(g => g.value > prop.line).length / prop.recentGames.length) * 100)
+    : 0;
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
@@ -52,8 +69,8 @@ export function PropCard({ prop, onPress }: PropCardProps) {
             {/* Header */}
             <View style={styles.headerRow}>
               <PlayerAvatar
-                imageUrl={prop.playerImage}
-                teamLogo={prop.teamLogo}
+                imageUrl={prop.headshot}
+                teamLogo={prop.team.logo}
                 size={72}
                 showTeamBadge={true}
               />
@@ -61,18 +78,18 @@ export function PropCard({ prop, onPress }: PropCardProps) {
                 <Text style={styles.playerName}>{prop.playerName}</Text>
                 <View style={styles.matchupContainer}>
                   <View style={styles.teamContainer}>
-                    <Text style={styles.teamName}>{prop.team}</Text>
+                    <Text style={styles.teamName}>{prop.team.abbreviation}</Text>
                     <Image
-                      source={{ uri: prop.teamLogo }}
+                      source={{ uri: prop.team.logo }}
                       style={styles.teamLogo}
                       resizeMode="contain"
                     />
                   </View>
                   <Text style={styles.vsText}>vs</Text>
                   <View style={styles.teamContainer}>
-                    <Text style={styles.teamName}>{prop.opponent}</Text>
+                    <Text style={styles.teamName}>{prop.opponent.abbreviation}</Text>
                     <Image
-                      source={{ uri: prop.opponentLogo }}
+                      source={{ uri: prop.opponent.logo }}
                       style={styles.teamLogo}
                       resizeMode="contain"
                     />
@@ -99,21 +116,21 @@ export function PropCard({ prop, onPress }: PropCardProps) {
 
             {/* Prop Info */}
             <View style={styles.propRow}>
-              <Text style={styles.propType}>{prop.propType}</Text>
+              <Text style={styles.propType}>{prop.statType}</Text>
               <View style={styles.lineContainer}>
                 <Text style={styles.lineLabel}>Line:</Text>
                 <Text style={styles.lineValue}>{prop.line}</Text>
               </View>
             </View>
 
-            {/* Projection & Confidence */}
+            {/* Season Avg & Confidence */}
             <View style={styles.statsRow}>
               <View style={styles.statBox}>
-                <Text style={styles.statLabel}>Projection</Text>
+                <Text style={styles.statLabel}>Season Avg</Text>
                 <View style={styles.projectionRow}>
-                  <Text style={styles.projectionValue}>{prop.projection}</Text>
-                  <Text style={[styles.pick, prop.over ? styles.pickOver : styles.pickUnder]}>
-                    {prop.over ? 'OVER' : 'UNDER'}
+                  <Text style={styles.projectionValue}>{prop.seasonAverage.toFixed(1)}</Text>
+                  <Text style={[styles.pick, prop.recommendation === 'OVER' ? styles.pickOver : styles.pickUnder]}>
+                    {prop.recommendation}
                   </Text>
                   <Ionicons name={getTrendIcon() as any} size={16} color={getTrendColor()} />
                 </View>
@@ -133,15 +150,15 @@ export function PropCard({ prop, onPress }: PropCardProps) {
             {/* Recent Form */}
             <View style={styles.recentGamesRow}>
               <Text style={styles.recentLabel}>L5: </Text>
-              {prop.recentGames.map((value, index) => (
+              {prop.recentGames.slice(0, 5).map((game, index) => (
                 <View
                   key={index}
                   style={[
                     styles.gameValue,
-                    value > prop.line ? styles.gameValueOver : styles.gameValueUnder
+                    game.value > prop.line ? styles.gameValueOver : styles.gameValueUnder
                   ]}
                 >
-                  <Text style={styles.gameValueText}>{value}</Text>
+                  <Text style={styles.gameValueText}>{game.value}</Text>
                 </View>
               ))}
             </View>
@@ -194,7 +211,7 @@ export function PropCard({ prop, onPress }: PropCardProps) {
                   <Text style={styles.gameTime}>{prop.gameTime}</Text>
                 </View>
               )}
-              <Text style={styles.hitRate}>Hit Rate: {prop.hitRate}%</Text>
+              <Text style={styles.hitRate}>Hit Rate: {hitRate}%</Text>
             </View>
           </View>
         </BlurView>

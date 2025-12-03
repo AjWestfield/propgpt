@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { PlayerProp } from '../data/mockProps';
+import { PlayerProp } from '../services/playerPropsService';
 import { PlayerStatsService, PlayerChartData } from '../services/playerStatsService';
 
 /**

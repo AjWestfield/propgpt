@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import { mockPlayerProps } from '../data/mockProps';
 
 const { height } = Dimensions.get('window');
 
@@ -67,66 +66,41 @@ export function ChatScreen() {
 
     // NBA props
     if (lowerQuery.includes('nba') || lowerQuery.includes('basketball')) {
-      const nbaProps = mockPlayerProps.filter(p => p.sport === 'NBA').slice(0, 3);
       return {
         id: Date.now().toString(),
-        text: `Here are the top NBA props for tonight:\n\n${nbaProps.map(p =>
-          `${p.playerName} - ${p.propType}\nLine: ${p.line} | Projection: ${p.projection} (${p.confidence}% confidence)\n${p.over ? 'OVER' : 'UNDER'}`
-        ).join('\n\n')}`,
+        text: "To see NBA props, check the Home screen where live odds and player props are displayed from real-time ESPN and Odds-API.io data!\n\nYou can filter by sport and see:\n• Live game scores\n• Player prop projections\n• Confidence ratings",
         isUser: false,
         timestamp: new Date(),
-        suggestions: ['Tell me more about LeBron', 'Show me NFL props', 'What about MLB?'],
+        suggestions: ['How do props work?', 'Show me NFL info', 'What about MLB?'],
       };
     }
 
     // High confidence
     if (lowerQuery.includes('high confidence') || lowerQuery.includes('best')) {
-      const highConf = mockPlayerProps.filter(p => p.confidence >= 85).slice(0, 3);
       return {
         id: Date.now().toString(),
-        text: `Here are the highest confidence props (85%+):\n\n${highConf.map(p =>
-          `${getSportEmoji(p.sport)} ${p.playerName} - ${p.propType}\n${p.projection} (${p.confidence}% confidence) ${p.over ? 'OVER' : 'UNDER'} ${p.line}`
-        ).join('\n\n')}`,
+        text: "High confidence picks (85%+) are shown on the Home screen!\n\nOur confidence ratings are calculated using:\n• Season averages\n• Recent game trends\n• Historical hit rates\n• Vegas line comparisons",
         isUser: false,
         timestamp: new Date(),
-        suggestions: ['More details', 'Show trending props', 'NFL picks'],
+        suggestions: ['How are picks calculated?', 'Show trending props', 'NFL picks'],
       };
     }
 
     // Trending
     if (lowerQuery.includes('trending') || lowerQuery.includes('hot')) {
-      const trending = mockPlayerProps.filter(p => p.trend === 'up').slice(0, 3);
       return {
         id: Date.now().toString(),
-        text: `📈 Trending props (players on hot streaks):\n\n${trending.map(p =>
-          `${getSportEmoji(p.sport)} ${p.playerName} - ${p.propType}\nProjection: ${p.projection} | Line: ${p.line}\nRecent L5: ${p.recentGames.join(', ')}`
-        ).join('\n\n')}`,
+        text: "Trending props show players on hot streaks!\n\nWe track:\n• Last 5 and 10 game performance\n• Hit rate percentages\n• Performance vs betting lines\n\nCheck the Home screen to see who's trending up!",
         isUser: false,
         timestamp: new Date(),
         suggestions: ['NBA only', 'Show all sports', 'High confidence picks'],
       };
     }
 
-    // Player specific
-    const player = mockPlayerProps.find(p =>
-      p.playerName.toLowerCase().includes(lowerQuery) ||
-      lowerQuery.includes(p.playerName.toLowerCase())
-    );
-
-    if (player) {
-      return {
-        id: Date.now().toString(),
-        text: `${getSportEmoji(player.sport)} ${player.playerName} Analysis:\n\n📊 ${player.propType}: ${player.line}\n🎯 Projection: ${player.projection}\n✨ Confidence: ${player.confidence}%\n📈 Pick: ${player.over ? 'OVER' : 'UNDER'}\n\n💡 Why: ${player.reasoning}\n\nRecent form (L5): ${player.recentGames.join(', ')}\nSeason avg: ${player.seasonAverage}\nVs ${player.opponent}: ${player.vsOpponentAverage}`,
-        isUser: false,
-        timestamp: new Date(),
-        suggestions: ['Show similar props', 'Other high confidence picks', 'More NBA props'],
-      };
-    }
-
     // Default response
     return {
       id: Date.now().toString(),
-      text: "I can help you find player props! Try asking about:\n\n• Specific sports (NBA, NFL, MLB, NHL)\n• Player names (LeBron, Mahomes, etc.)\n• High confidence picks\n• Trending props\n\nWhat would you like to know?",
+      text: "I can help you understand player props! Try asking about:\n\n• Specific sports (NBA, NFL, MLB, NHL)\n• How props work\n• High confidence picks\n• Trending props\n\nFor live props data, check the Home screen!",
       isUser: false,
       timestamp: new Date(),
       suggestions: ['Show me NBA props', 'Best picks tonight', 'What\'s trending?'],

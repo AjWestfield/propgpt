@@ -17,7 +17,7 @@ import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { PlayerCard } from '../components/PlayerCard';
 import { PlayerPropsModal } from '../components/PlayerPropsModal';
-import { PlayerProp as OldPlayerProp, GameOption, Team } from '../types/playerProp';
+import { GameOption, Team } from '../types/playerProp';
 import { SportsAPI, RealPlayer, ESPNGame } from '../services/sportsApi';
 import { PropsCalculator, PlayerStats } from '../services/propsCalculator';
 import { PlayerPropsService, PlayerProp } from '../services/playerPropsService';
@@ -34,7 +34,7 @@ type FilterType = 'all' | 'prop' | 'team' | 'confidence';
 
 export function HomeScreen({ navigation }: any) {
   const [selectedSport, setSelectedSport] = useState<Sport>('NBA');
-  const [props, setProps] = useState<OldPlayerProp[]>([]);
+  const [props, setProps] = useState<PlayerProp[]>([]);
   const [loading, setLoading] = useState(true); // Start with loading true
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,73 +93,6 @@ export function HomeScreen({ navigation }: any) {
   // Note: getPropTypesBySport and generatePropsFromRealPlayers removed
   // Now using PlayerPropsService which handles all prop generation
 
-  // Convert new PlayerProp format to old format for UI compatibility
-  const convertNewPropToOld = (newProp: PlayerProp): OldPlayerProp => {
-    // Calculate projection from recent games
-    const projection = newProp.recentGames.length > 0
-      ? newProp.recentGames.reduce((sum, g) => sum + g.value, 0) / newProp.recentGames.length
-      : newProp.seasonAverage;
-
-    // Calculate vsOpponentAverage (use season average as fallback)
-    const vsOpponentAverage = newProp.seasonAverage;
-
-    // Determine over/under
-    const over = newProp.recommendation === 'OVER';
-
-    // Calculate trend based on recent games
-    const trend: 'up' | 'down' | 'stable' = newProp.recentGames.length >= 3
-      ? (() => {
-          const firstHalf = newProp.recentGames.slice(0, Math.floor(newProp.recentGames.length / 2));
-          const secondHalf = newProp.recentGames.slice(Math.floor(newProp.recentGames.length / 2));
-          const firstAvg = firstHalf.reduce((sum, g) => sum + g.value, 0) / firstHalf.length;
-          const secondAvg = secondHalf.reduce((sum, g) => sum + g.value, 0) / secondHalf.length;
-          const diff = ((secondAvg - firstAvg) / firstAvg) * 100;
-          return diff > 10 ? 'up' : diff < -10 ? 'down' : 'stable';
-        })()
-      : 'stable';
-
-    // Calculate hit rate
-    const hitRate = newProp.recentGames.length > 0
-      ? (newProp.recentGames.filter(g => over ? g.value > newProp.line : g.value < newProp.line).length / newProp.recentGames.length) * 100
-      : 50;
-
-    // Generate reasoning
-    const reasoning = `${newProp.playerName} ${newProp.recommendation === 'OVER' ? 'trending over' : 'trending under'} ${newProp.line} ${newProp.statType.toLowerCase()} with ${newProp.confidence}% confidence`;
-
-    return {
-      id: newProp.id,
-      playerId: newProp.playerId,
-      playerName: newProp.playerName,
-      playerImage: newProp.headshot,
-      team: newProp.team.abbreviation,
-      teamLogo: newProp.team.logo,
-      opponent: newProp.opponent.abbreviation,
-      opponentLogo: newProp.opponent.logo,
-      sport: newProp.sport,
-      propType: newProp.statType,
-      line: newProp.line,
-      projection: Math.round(projection * 10) / 10,
-      confidence: newProp.confidence,
-      over,
-      gameTime: newProp.gameTime,
-      recentGames: newProp.recentGames.map(g => g.value),
-      seasonAverage: newProp.seasonAverage,
-      vsOpponentAverage,
-      trend,
-      hitRate: Math.round(hitRate),
-      reasoning,
-      // Game filter fields
-      gameId: newProp.gameId,
-      gameName: newProp.gameName,
-      gameStatus: newProp.gameStatus,
-      homeTeam: newProp.homeTeam,
-      awayTeam: newProp.awayTeam,
-      // College-specific fields
-      classYear: newProp.classYear,
-      conference: newProp.conference,
-    };
-  };
-
   // Fetch real-time data using PlayerPropsService
   const fetchPropsData = async (isRefresh = false) => {
     if (isRefresh) {
@@ -202,11 +135,7 @@ export function HomeScreen({ navigation }: any) {
         setProps([]);
       } else {
         console.log(`Loaded ${newProps.length} real props for ${selectedSport}`);
-        // Convert new format to old format for UI compatibility
-        const convertedProps = newProps.map(convertNewPropToOld);
-        console.log(`Converted ${convertedProps.length} props`);
-        console.log(`First converted prop:`, JSON.stringify(convertedProps[0], null, 2));
-        setProps(convertedProps);
+        setProps(newProps);
       }
     } catch (err) {
       console.error('Error fetching props:', err);
@@ -327,7 +256,7 @@ export function HomeScreen({ navigation }: any) {
 
     // Apply prop type filter
     if (propTypeFilter !== 'All') {
-      filtered = filtered.filter(prop => prop.propType === propTypeFilter);
+      filtered = filtered.filter(prop => prop.statType === propTypeFilter);
     }
 
     // Apply confidence filter
@@ -342,7 +271,7 @@ export function HomeScreen({ navigation }: any) {
     }
 
     // Group by player name
-    const grouped: { [key: string]: OldPlayerProp[] } = {};
+    const grouped: { [key: string]: PlayerProp[] } = {};
     filtered.forEach(prop => {
       if (!grouped[prop.playerName]) {
         grouped[prop.playerName] = [];
@@ -358,7 +287,7 @@ export function HomeScreen({ navigation }: any) {
   // Get available prop types for the current sport
   const availablePropTypes = React.useMemo(() => {
     const types = new Set(
-      props.filter(prop => prop.sport === selectedSport).map(prop => prop.propType)
+      props.filter(prop => prop.sport === selectedSport).map(prop => prop.statType)
     );
     return ['All', ...Array.from(types)];
   }, [props, selectedSport]);

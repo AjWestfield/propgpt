@@ -123,7 +123,6 @@ export interface MLBPlayerStats {
     balks?: number;
     wildPitches?: number;
     pickoffs?: number;
-    totalBases?: number;
     era?: string;
     whip?: string;
     battersFaced?: number;
@@ -133,10 +132,6 @@ export interface MLBPlayerStats {
     shutouts?: number;
     strikes?: number;
     strikePercentage?: string;
-    hitBatsmen?: number;
-    balks?: number;
-    wildPitches?: number;
-    pickoffs?: number;
   };
 }
 

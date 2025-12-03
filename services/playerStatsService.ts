@@ -8,11 +8,7 @@ import {
   ChartDataPoint,
   HitRateData,
 } from '../utils/chartDataFormatter';
-import { PlayerProp as MockPlayerProp } from '../data/mockProps';
-import { PlayerProp as RealPlayerProp } from './playerPropsService';
-
-// Support both PlayerProp types (mock and real)
-type PlayerProp = MockPlayerProp | RealPlayerProp;
+import { PlayerProp } from './playerPropsService';
 
 export interface PlayerChartData {
   chartData: ChartDataPoint[];
@@ -51,9 +47,9 @@ export class PlayerStatsService {
     compact: boolean = false
   ): Promise<PlayerChartData> {
     try {
-      // Extract player name and prop type - handle both mock and real prop interfaces
+      // Extract player name and prop type
       const playerName = playerProp.playerName;
-      const propType = 'propType' in playerProp ? playerProp.propType : playerProp.statType;
+      const propType = playerProp.statType;
       const line = playerProp.line;
       const sport = playerProp.sport;
 
@@ -168,7 +164,7 @@ export class PlayerStatsService {
           streak: { count: 0, type: 'none' },
         },
         trend: 'stable',
-        seasonAverage: seasonAverage ? this.extractSeasonStatValue(seasonAverage, propType) : 0,
+        seasonAverage: 0,
         last5Average: 0,
         last10Average: 0,
         loading: false,

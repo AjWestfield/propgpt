@@ -28,7 +28,7 @@ export function PlayerCard({ playerName, playerProps, onPress }: PlayerCardProps
   );
 
   // Count over/under picks
-  const overCount = playerProps.filter(p => p.over).length;
+  const overCount = playerProps.filter(p => p.recommendation === 'OVER').length;
   const underCount = propsCount - overCount;
 
   // Find highest confidence prop
@@ -54,8 +54,8 @@ export function PlayerCard({ playerName, playerProps, onPress }: PlayerCardProps
             {/* Header */}
             <View style={styles.headerRow}>
               <PlayerAvatar
-                imageUrl={firstProp.playerImage}
-                teamLogo={firstProp.teamLogo}
+                imageUrl={firstProp.headshot}
+                teamLogo={firstProp.team.logo}
                 size={88}
                 showTeamBadge={true}
               />
@@ -63,18 +63,18 @@ export function PlayerCard({ playerName, playerProps, onPress }: PlayerCardProps
                 <Text style={styles.playerName}>{playerName}</Text>
                 <View style={styles.matchupContainer}>
                   <View style={styles.teamContainer}>
-                    <Text style={styles.teamName}>{firstProp.team}</Text>
+                    <Text style={styles.teamName}>{firstProp.team.abbreviation}</Text>
                     <Image
-                      source={{ uri: firstProp.teamLogo }}
+                      source={{ uri: firstProp.team.logo }}
                       style={styles.teamLogo}
                       resizeMode="contain"
                     />
                   </View>
                   <Text style={styles.vsText}>vs</Text>
                   <View style={styles.teamContainer}>
-                    <Text style={styles.teamName}>{firstProp.opponent}</Text>
+                    <Text style={styles.teamName}>{firstProp.opponent.abbreviation}</Text>
                     <Image
-                      source={{ uri: firstProp.opponentLogo }}
+                      source={{ uri: firstProp.opponent.logo }}
                       style={styles.teamLogo}
                       resizeMode="contain"
                     />
@@ -116,9 +116,9 @@ export function PlayerCard({ playerName, playerProps, onPress }: PlayerCardProps
                   <Text style={styles.bestPickLabel}>Best Pick</Text>
                 </View>
                 <View style={styles.bestPickHeaderRight}>
-                  <View style={[styles.pickBadge, bestProp.over ? styles.pickBadgeOver : styles.pickBadgeUnder]}>
-                    <Text style={[styles.pickBadgeText, bestProp.over ? styles.pickBadgeTextOver : styles.pickBadgeTextUnder]}>
-                      {bestProp.over ? 'OVER' : 'UNDER'}
+                  <View style={[styles.pickBadge, bestProp.recommendation === 'OVER' ? styles.pickBadgeOver : styles.pickBadgeUnder]}>
+                    <Text style={[styles.pickBadgeText, bestProp.recommendation === 'OVER' ? styles.pickBadgeTextOver : styles.pickBadgeTextUnder]}>
+                      {bestProp.recommendation}
                     </Text>
                   </View>
                   <TouchableOpacity
@@ -136,13 +136,13 @@ export function PlayerCard({ playerName, playerProps, onPress }: PlayerCardProps
                   </TouchableOpacity>
                 </View>
               </View>
-              <Text style={styles.bestPickType}>{bestProp.propType}</Text>
+              <Text style={styles.bestPickType}>{bestProp.statType}</Text>
               <View style={styles.bestPickStats}>
                 <Text style={styles.bestPickStat}>
                   Line: <Text style={styles.bestPickStatValue}>{bestProp.line}</Text>
                 </Text>
                 <Text style={styles.bestPickStat}>
-                  Proj: <Text style={styles.bestPickStatValue}>{bestProp.projection}</Text>
+                  Avg: <Text style={styles.bestPickStatValue}>{bestProp.seasonAverage.toFixed(1)}</Text>
                 </Text>
                 <Text style={styles.bestPickStat}>
                   Conf: <Text style={[styles.bestPickStatValue, { color: confidenceColor }]}>

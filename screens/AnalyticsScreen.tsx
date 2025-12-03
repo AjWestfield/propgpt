@@ -531,15 +531,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 12,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: -0.4,
-  },
-  section: {
-    marginBottom: 20,
-  },
   loadMoreButton: {
     flexDirection: 'row',
     alignItems: 'center',

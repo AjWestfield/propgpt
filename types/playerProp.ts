@@ -1,43 +1,11 @@
 /**
  * Player Prop Type Definitions
- * Interface for legacy UI components
- * Note: This is for backward compatibility only
- * New code should use PlayerProp from services/playerPropsService.ts
+ * Re-exports the canonical PlayerProp from playerPropsService
+ * All other types for odds, sportsbooks, and game options are defined here
  */
 
-export interface PlayerProp {
-  id: string;
-  playerId: string;
-  playerName: string;
-  playerImage: string; // CDN image URL
-  team: string;
-  teamLogo: string;
-  opponent: string;
-  opponentLogo: string;
-  sport: 'NBA' | 'NFL' | 'MLB' | 'NHL' | 'NCAAF' | 'NCAAB';
-  propType: string;
-  line: number;
-  projection: number;
-  confidence: number; // 0-100
-  over: boolean; // true = over, false = under
-  gameTime: string;
-  recentGames: number[];
-  seasonAverage: number;
-  vsOpponentAverage: number;
-  trend: 'up' | 'down' | 'stable';
-  hitRate: number; // percentage
-  reasoning: string;
-  isLive?: boolean;
-  // Game filter fields
-  gameId: string; // ESPN game ID
-  gameName: string; // e.g., "Lakers vs Celtics"
-  gameStatus: 'upcoming' | 'live' | 'completed';
-  homeTeam: string; // Home team abbreviation
-  awayTeam: string; // Away team abbreviation
-  // College-specific fields
-  classYear?: string; // e.g., "FR", "SO", "JR", "SR"
-  conference?: string; // e.g., "SEC", "Big Ten"
-}
+// Re-export the canonical PlayerProp interface from the service
+export { PlayerProp } from '../services/playerPropsService';
 
 export interface Team {
   name: string;
